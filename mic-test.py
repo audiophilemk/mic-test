@@ -1,5 +1,6 @@
 import io
 from pydub import AudioSegment
+from IPython.display import display
 import speech_recognition as sr
 import whisper
 import queue
