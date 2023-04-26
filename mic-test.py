@@ -1,6 +1,5 @@
 import io
 from pydub import AudioSegment
-from IPython.display import display
 import speech_recognition as sr
 import whisper
 import queue
@@ -38,31 +37,17 @@ def main(model, english,verbose, energy, pause,dynamic_energy,save_file,device):
 
 
 def record_audio(audio_queue, energy, pause, dynamic_energy, save_file, temp_dir):
-    # load the speech recognizer and set the initial energy threshold and pause threshold
+    #load the speech recognizer and set the initial energy threshold and pause threshold
     r = sr.Recognizer()
     r.energy_threshold = energy
     r.pause_threshold = pause
     r.dynamic_energy_threshold = dynamic_energy
 
-    # use the IPython module to execute JavaScript that asks the user for microphone permission
-    from IPython.display import Javascript
-    from google.colab import output
-    def enable_microphone():
-        display(Javascript('''
-        const audioPromise = navigator.mediaDevices.getUserMedia({ audio: true });
-        const ac = new AudioContext();
-        const microphoneStream = ac.createMediaStreamSource(audioPromise);
-        window.AudioContext = ac;
-        window.microphoneStream = microphoneStream;
-        '''))
-    enable_microphone()
-
-    # use the user's microphone as the source for the recognizer
-    with sr.Microphone(sample_rate=16000, source = getattr(window, 'microphoneStream', None)) as source:
+    with sr.Microphone(sample_rate=16000) as source:
         print("Say something!")
         i = 0
         while True:
-            # get and save audio to wav file
+            #get and save audio to wav file
             audio = r.listen(source)
             if save_file:
                 data = io.BytesIO(audio.get_wav_data())
@@ -97,3 +82,4 @@ def transcribe_forever(audio_queue, result_queue, audio_model, english, verbose,
 
 if __name__ == "__main__":
     main()
+
